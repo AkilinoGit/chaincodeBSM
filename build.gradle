@@ -1,0 +1,37 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.17'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'application'
+}
+
+group = 'com.bsm'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '11'
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		url 'https://jitpack.io'
+	}
+
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// https://mvnrepository.com/artifact/org.hyperledger.fabric-chaincode-java/fabric-chaincode-shim
+	implementation 'org.hyperledger.fabric-chaincode-java:fabric-chaincode-shim:2.5.0'
+	// https://mvnrepository.com/artifact/com.owlike/genson
+	implementation 'com.owlike:genson:1.5'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+
+
