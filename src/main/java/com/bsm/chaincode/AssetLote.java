@@ -11,24 +11,31 @@ import java.util.Objects;
 public final class AssetLote {
 
     @Property()
+    @JsonProperty("id")
     private final String id;
 
     @Property()
+    @JsonProperty("producto")
     private final String producto;
 
     @Property()
+    @JsonProperty("kg")
     private final String kg;
 
     @Property()
+    @JsonProperty("km")
     private final String km;
 
     @Property()
+    @JsonProperty("precioKgFinal")
     private final String precioKgFinal;
 
     @Property()
+    @JsonProperty("origen")
     private final String origen;
 
     @Property()
+    @JsonProperty("intermediarios")
     private final List<String> intermediarios;
 
 

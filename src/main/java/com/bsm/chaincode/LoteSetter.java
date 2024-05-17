@@ -28,13 +28,24 @@ public final class LoteSetter implements ContractInterface {
 
     private enum LoteSetterErrors {
         LOTE_NOT_FOUND,
-        LOTE_ALREADY_EXISTS
+        LOTE_ALREADY_EXISTS,
+        OPERATION_NOT_AUTHORIZED
+    }
+    private enum Orgs {
+        Org1MSPClient,
+        Org2MSPClient
+
     }
 
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public AssetLote registrarLote(final Context ctx, final String id, final String producto, final String kg, final String origen) {
         //Solo puede registrar la ORG1
         ChaincodeStub stub = ctx.getStub();
+        if (!ctx.getClientIdentity().getMSPID().equals(Orgs.Org1MSPClient.toString())) {
+            String errorMessage = String.format("Es necesario pertenecer a la Org1", ctx.getClientIdentity().getMSPID());
+            System.out.println(errorMessage);
+            throw new ChaincodeException(errorMessage, LoteSetterErrors.OPERATION_NOT_AUTHORIZED.toString());
+        }
 
         String state = stub.getStringState(id);
 
@@ -59,6 +70,11 @@ public final class LoteSetter implements ContractInterface {
     public String transportararLote(final Context ctx, final String id, final String km) {
         //Solo puede transportar la ORG2
         ChaincodeStub stub = ctx.getStub();
+        // if (!ctx.getClientIdentity().getMSPID().equals(Orgs.Org2MSPClient.toString())) {
+        //     String errorMessage = String.format("Es necesario pertenecer a la Org2", ctx.getClientIdentity().getMSPID());
+        //     System.out.println(errorMessage);
+        //     throw new ChaincodeException(errorMessage, LoteSetterErrors.OPERATION_NOT_AUTHORIZED.toString());
+        // }
 
         String state = stub.getStringState(id);
 
@@ -99,7 +115,7 @@ public final class LoteSetter implements ContractInterface {
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
 
-        return "Lote de " + asset.getProduct() + "en venta a " + precio + "€/kg";
+        return "Lote de " + asset.getProduct() + "en venta a " + precio + "euros/kg";
     }
     /*
     CREAR SETTERS
@@ -155,6 +171,7 @@ public final class LoteSetter implements ContractInterface {
     public String verIdentidad(final Context ctx) {
         return "Client identity MSPID: " + ctx.getClientIdentity().getMSPID() + "Client ID: " + ctx.getClientIdentity().getId();
     }
+    //"Client identity MSPID: "Org1MSPClient "Client ID: "x509::CN=org1admin, OU=admin, O=Hyperledger, ST=North Carolina, C=US::CN=ca.org1.example.com, O=org1.example.com, L=Durham, ST=North Carolina, C=US";
 
 /*
     @Transaction(intent = Transaction.TYPE.SUBMIT)
