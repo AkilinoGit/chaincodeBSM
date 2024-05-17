@@ -32,8 +32,8 @@ public final class LoteSetter implements ContractInterface {
         OPERATION_NOT_AUTHORIZED
     }
     private enum Orgs {
-        Org1MSPClient,
-        Org2MSPClient
+        Org1MSP,
+        Org2MSP
 
     }
 
@@ -41,8 +41,8 @@ public final class LoteSetter implements ContractInterface {
     public AssetLote registrarLote(final Context ctx, final String id, final String producto, final String kg, final String origen) {
         //Solo puede registrar la ORG1
         ChaincodeStub stub = ctx.getStub();
-        if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org1MSPClient.toString().toLowerCase())) {
-            String errorMessage = String.format("Es necesario pertenecer a la Org1, you are:" + ctx.getClientIdentity().getMSPID().toLowerCase() + "We want:" + Orgs.Org1MSPClient.toString().toLowerCase()  , ctx.getClientIdentity().getMSPID());
+        if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org1MSP.toString().toLowerCase())) {
+            String errorMessage = String.format("Es necesario pertenecer a la Org1, you are:" + ctx.getClientIdentity().getMSPID().toLowerCase() + "We want:" + Orgs.Org1MSP.toString().toLowerCase()  , ctx.getClientIdentity().getMSPID());
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage, LoteSetterErrors.OPERATION_NOT_AUTHORIZED.toString());
         }
@@ -70,11 +70,11 @@ public final class LoteSetter implements ContractInterface {
     public String transportararLote(final Context ctx, final String id, final String km) {
         //Solo puede transportar la ORG2
         ChaincodeStub stub = ctx.getStub();
-        // if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org2MSPClient.toString().toLowerCase())) {
-        //     String errorMessage = String.format("Es necesario pertenecer a la Org2", ctx.getClientIdentity().getMSPID());
-        //     System.out.println(errorMessage);
-        //     throw new ChaincodeException(errorMessage, LoteSetterErrors.OPERATION_NOT_AUTHORIZED.toString());
-        // }
+         if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org2MSP.toString().toLowerCase())) {
+            String errorMessage = String.format("Es necesario pertenecer a la Org2, you are:" + ctx.getClientIdentity().getMSPID().toLowerCase() + "We want:" + Orgs.Org2MSP.toString().toLowerCase()  , ctx.getClientIdentity().getMSPID());
+            System.out.println(errorMessage);
+             throw new ChaincodeException(errorMessage, LoteSetterErrors.OPERATION_NOT_AUTHORIZED.toString());
+         }
 
         String state = stub.getStringState(id);
 
