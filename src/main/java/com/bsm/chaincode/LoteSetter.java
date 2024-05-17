@@ -42,7 +42,7 @@ public final class LoteSetter implements ContractInterface {
         //Solo puede registrar la ORG1
         ChaincodeStub stub = ctx.getStub();
         if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org1MSPClient.toString().toLowerCase())) {
-            String errorMessage = String.format("Es necesario pertenecer a la Org1", ctx.getClientIdentity().getMSPID());
+            String errorMessage = String.format("Es necesario pertenecer a la Org1, you are:" + ctx.getClientIdentity().getMSPID().toLowerCase() + "We want:" + Orgs.Org1MSPClient.toString().toLowerCase()  , ctx.getClientIdentity().getMSPID());
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage, LoteSetterErrors.OPERATION_NOT_AUTHORIZED.toString());
         }
