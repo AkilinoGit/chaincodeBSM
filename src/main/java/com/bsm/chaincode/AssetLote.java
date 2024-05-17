@@ -27,7 +27,7 @@ public final class AssetLote {
     private final String km;
 
     @Property()
-    @JsonProperty("precioKgFinal")
+    @JsonProperty("precioKg")
     private final String precioKgFinal;
 
     @Property()
