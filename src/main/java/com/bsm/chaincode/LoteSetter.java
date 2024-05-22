@@ -67,7 +67,7 @@ public final class LoteSetter implements ContractInterface {
         return lote;
     }
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public String transportararLote(final Context ctx, final String id, final String km) {
+    public String transportarLote(final Context ctx, final String id, final String km) {
         //Solo puede transportar la ORG2
         ChaincodeStub stub = ctx.getStub();
          if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org2MSP.toString().toLowerCase())) {
@@ -92,7 +92,7 @@ public final class LoteSetter implements ContractInterface {
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
 
-        return km + "Km transportados pr la empresa : " /*Añadir nombre peer*/;
+        return km + "Km transportados por la empresa : " /*Añadir nombre peer*/;
     }
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String venderLote(final Context ctx, final String id, final String precio) {
