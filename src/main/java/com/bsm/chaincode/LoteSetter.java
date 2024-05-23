@@ -14,6 +14,8 @@ import org.hyperledger.fabric.shim.ledger.QueryResultsIterator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Contract(
         name = "LoteSetter",
@@ -56,7 +58,7 @@ public final class LoteSetter implements ContractInterface {
         }
 
         List<String> intermediarios = new ArrayList<>();
-        //Obtener nombre de peer a través de su certificado obtenido así: byte[] creator = stub.getCreator();
+        intermediarios.add(ctx.getClientIdentity().getId());
 
         AssetLote lote = new AssetLote(id, producto, kg,"","", origen, intermediarios);
 
@@ -84,15 +86,15 @@ public final class LoteSetter implements ContractInterface {
             throw new ChaincodeException(errorMessage, LoteSetterErrors.LOTE_NOT_FOUND.toString());
         } 
         AssetLote asset = genson.deserialize(state, AssetLote.class);
-        //List<String> listaIntermediarios = asset.getIntermediarios();
-        // Obtener PeerTransporte listaIntermediarios.add(newOwner); 
+        List<String> intermediarios = asset.getIntermediarios();
+        intermediarios.add(ctx.getClientIdentity().getId()); 
         AssetLote newAsset =
-        new AssetLote(asset.getId(),asset.getProduct(),asset.getKg(),km,asset.getPrecioKgFinal(),asset.getOrigen(),asset.getIntermediarios());
+        new AssetLote(asset.getId(),asset.getProduct(),asset.getKg(),km,asset.getPrecioKgFinal(),asset.getOrigen(),intermediarios);
 
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
-
-        return km + "Km transportados por la empresa : " /*Añadir nombre peer*/;
+        String cn = getNameFromId(ctx.getClientIdentity().getId());
+        return km + "Km transportados por la empresa : " + cn ;
     }
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String venderLote(final Context ctx, final String id, final String precio) {
@@ -107,10 +109,10 @@ public final class LoteSetter implements ContractInterface {
             throw new ChaincodeException(errorMessage, LoteSetterErrors.LOTE_NOT_FOUND.toString());
         } 
         AssetLote asset = genson.deserialize(state, AssetLote.class);
-        //List<String> listaIntermediarios = asset.getIntermediarios();
-        // Obtener PeerTransporte listaIntermediarios.add(newOwner); 
+        List<String> intermediarios = asset.getIntermediarios();
+        intermediarios.add(ctx.getClientIdentity().getId()); 
         AssetLote newAsset =
-        new AssetLote(asset.getId(),asset.getProduct(),asset.getKg(),asset.getKm(),precio,asset.getOrigen(),asset.getIntermediarios());
+        new AssetLote(asset.getId(),asset.getProduct(),asset.getKg(),asset.getKm(),precio,asset.getOrigen(),intermediarios);
 
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
@@ -170,6 +172,16 @@ public final class LoteSetter implements ContractInterface {
     @Transaction(intent = Transaction.TYPE.EVALUATE)
     public String verIdentidad(final Context ctx) {
         return "Client identity MSPID: " + ctx.getClientIdentity().getMSPID() + "Client ID: " + ctx.getClientIdentity().getId();
+    }
+
+    public String getNameFromId(String id){
+        String cn="User";
+        Pattern pattern = Pattern.compile("CN=([^,]+)");
+        Matcher matcher = pattern.matcher(id);
+        if (matcher.find()) {
+           cn = matcher.group(1);
+        }
+        return cn;
     }
     //"Client identity MSPID: "Org1MSPClient "Client ID: "x509::CN=org1admin, OU=admin, O=Hyperledger, ST=North Carolina, C=US::CN=ca.org1.example.com, O=org1.example.com, L=Durham, ST=North Carolina, C=US";
 
