@@ -40,7 +40,7 @@ public final class LoteSetter implements ContractInterface {
     }
 
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public AssetLote registrarLote(final Context ctx, final String id, final String producto, final String kg, final String origen) {
+    public String registrarLote(final Context ctx, final String id, final String producto, final String kg, final String origen) {
         //Solo puede registrar la ORG1
         ChaincodeStub stub = ctx.getStub();
         if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org1MSP.toString().toLowerCase())) {
@@ -66,7 +66,7 @@ public final class LoteSetter implements ContractInterface {
 
         stub.putStringState(id, newState);
 
-        return lote;
+        return lote.toString();
     }
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String transportarLote(final Context ctx, final String id, final String km) {
@@ -94,7 +94,7 @@ public final class LoteSetter implements ContractInterface {
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
         String cn = getNameFromId(ctx.getClientIdentity().getId());
-        return km + "Km transportados por la empresa : " + cn ;
+        return km + "Km_transportados_por_la_empresa_:_" + cn ;
     }
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String venderLote(final Context ctx, final String id, final String precio) {
@@ -117,7 +117,7 @@ public final class LoteSetter implements ContractInterface {
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
 
-        return "Lote de " + asset.getProduct() + "en venta a " + precio + "euros/kg";
+        return "Lote_de_" + asset.getProduct() + "en_venta_a_" + precio + "euros/kg";
     }
     /*
     CREAR SETTERS
@@ -183,38 +183,5 @@ public final class LoteSetter implements ContractInterface {
         }
         return cn;
     }
-    //"Client identity MSPID: "Org1MSPClient "Client ID: "x509::CN=org1admin, OU=admin, O=Hyperledger, ST=North Carolina, C=US::CN=ca.org1.example.com, O=org1.example.com, L=Durham, ST=North Carolina, C=US";
-
-/*
-    @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public String transferenciaJamon(final Context ctx, final String id, final String newOwner, final String newValue) {
-        ChaincodeStub stub = ctx.getStub();
-        String state = stub.getStringState(id);
-
-        if (state == null || state.isEmpty()) {
-            String errorMessage = String.format("Jamon no registrado", id);
-            System.out.println(errorMessage);
-            throw new ChaincodeException(errorMessage, LoteSetterErrors.JAMON_NOT_FOUND.toString());
-        }
-
-        AssetLote asset = genson.deserialize(state, AssetLote.class);
-        List<String> listaIntermediarios = asset.getIntermediarios();
-        listaIntermediarios.add(newOwner);
-
-        AssetLote
-            newAsset = new AssetLote(asset.getId(), asset.getRaza(), asset.getAlimentacion(), asset.getDenominacionOrigen(), newOwner ,newValue, asset.getIntermediarios());
-        String sortedJson = genson.serialize(newAsset);
-        stub.putStringState(id, sortedJson);
-
-        return "Nuevo propietario: " + newOwner;
-    }
-
- */
-
-
-
-
-
-
-
+    //"Client identity MSPID: "Org1MSPClient "Client ID: "x509::CN=org1admin, OU=admin, O=Hyperledger, ST=North Carolina, C=US::CN=ca.org1.example.com, O=org1.example.com, L=Durham, ST=North Carolina, C=US";   
 }
