@@ -94,7 +94,6 @@ public final class LoteSetter implements ContractInterface {
 
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
-        String cn = getNameFromId(ctx.getClientIdentity().getId());
         return sortedJson;
     }
     @Transaction(intent = Transaction.TYPE.SUBMIT)
@@ -129,6 +128,11 @@ public final class LoteSetter implements ContractInterface {
     public void loteVendido(final Context ctx, final String id) {
         //Solo ORG3
         ChaincodeStub stub = ctx.getStub();
+        if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org3MSP.toString().toLowerCase())) {
+            String errorMessage = String.format("Es necesario pertenecer a la Org3, you are:" + ctx.getClientIdentity().getMSPID().toLowerCase() + "We want:" + Orgs.Org2MSP.toString().toLowerCase()  , ctx.getClientIdentity().getMSPID());
+            System.out.println(errorMessage);
+             throw new ChaincodeException(errorMessage, LoteSetterErrors.OPERATION_NOT_AUTHORIZED.toString());
+         }
 
         String state = stub.getStringState(id);
 
