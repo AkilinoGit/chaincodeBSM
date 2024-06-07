@@ -35,7 +35,8 @@ public final class LoteSetter implements ContractInterface {
     }
     private enum Orgs {
         Org1MSP,
-        Org2MSP
+        Org2MSP,
+        Org3MSP
 
     }
 
@@ -66,7 +67,7 @@ public final class LoteSetter implements ContractInterface {
 
         stub.putStringState(id, newState);
 
-        return lote.toString();
+        return newState;
     }
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String transportarLote(final Context ctx, final String id, final String km) {
@@ -94,13 +95,17 @@ public final class LoteSetter implements ContractInterface {
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
         String cn = getNameFromId(ctx.getClientIdentity().getId());
-        return km + "Km_transportados_por_la_empresa_:_" + cn ;
+        return sortedJson;
     }
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String venderLote(final Context ctx, final String id, final String precio) {
         //Solo puede vender la ORG3
         ChaincodeStub stub = ctx.getStub();
-
+        if (!ctx.getClientIdentity().getMSPID().toLowerCase().equals(Orgs.Org3MSP.toString().toLowerCase())) {
+           String errorMessage = String.format("Es necesario pertenecer a la Org3, you are:" + ctx.getClientIdentity().getMSPID().toLowerCase() + "We want:" + Orgs.Org2MSP.toString().toLowerCase()  , ctx.getClientIdentity().getMSPID());
+           System.out.println(errorMessage);
+            throw new ChaincodeException(errorMessage, LoteSetterErrors.OPERATION_NOT_AUTHORIZED.toString());
+        }
         String state = stub.getStringState(id);
 
         if (state.isEmpty()) {
@@ -117,11 +122,9 @@ public final class LoteSetter implements ContractInterface {
         String sortedJson = genson.serialize(newAsset);
         stub.putStringState(id, sortedJson);
 
-        return "Lote_de_" + asset.getProduct() + "en_venta_a_" + precio + "euros/kg";
+        return sortedJson;
     }
-    /*
-    CREAR SETTERS
-     */
+ 
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public void loteVendido(final Context ctx, final String id) {
         //Solo ORG3
